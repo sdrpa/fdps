@@ -1,6 +1,6 @@
 # FDPS
 
-Flight Data Processing System. (FDPServer and FDPClient ...)
+Flight Data Processing System. (FDPServer, FDPClient ...)
 
 # Contributions
 
