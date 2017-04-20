@@ -27,8 +27,8 @@ public final class FDPServer {
         self.socketServer.run()
     }
 
-    public func broadcast(flights: [Flight]) {
-        guard let json = FDPS.Message.FlightsUpdate(flights: flights).toJSON() else {
+    public func broadcast(flightsUpdate: Message.FlightsUpdate) {
+        guard let json = flightsUpdate.toJSON() else {
             return
         }
         do {

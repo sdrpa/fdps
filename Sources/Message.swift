@@ -15,10 +15,12 @@
  */
 
 import ATCKit
+import Foundation
 import JSON
 
 public protocol Messageable  {
     var messageType: MessageType { get }
+    var timestamp: TimeInterval { get }
 }
 
 public enum MessageType: Int {
@@ -28,14 +30,24 @@ public enum MessageType: Int {
 
 public struct Message {
 
-    public struct FlightsUpdate: Messageable {
+    public struct FlightsUpdate: Messageable, Equatable {
 
         public let messageType: MessageType
+        public let timestamp: TimeInterval
         public let flights: [Flight]
 
-        public init(messageType: MessageType = .flightsUpdate, flights: [Flight]) {
+        public init(messageType: MessageType = .flightsUpdate,
+                    timestamp: TimeInterval,
+                    flights: [Flight]) {
             self.messageType = messageType
+            self.timestamp = timestamp
             self.flights = flights
+        }
+
+        public static func ==(lhs: FlightsUpdate, rhs: FlightsUpdate) -> Bool {
+            return lhs.messageType == rhs.messageType &&
+                lhs.timestamp == rhs.timestamp &&
+                lhs.flights == rhs.flights
         }
     }
 }
@@ -44,16 +56,19 @@ extension Message.FlightsUpdate: Coding {
 
     public init?(json: JSON) {
         guard let messageType: MessageType = "messageType" <| json,
+            let timestamp: TimeInterval = "timestamp" <| json,
             let flights: [Flight] = "flights" <| json else {
                 return nil
         }
         self.messageType = messageType
+        self.timestamp = timestamp
         self.flights = flights
     }
 
     public func toJSON() -> JSON? {
         return jsonify([
             "messageType" |> self.messageType,
+            "timestamp" |> self.timestamp,
             "flights" |> self.flights
             ])
     }

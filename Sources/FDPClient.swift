@@ -22,7 +22,7 @@ public final class FDPClient {
 
     private let socketClient: SocketClient
 
-    public var flightsUpdate: (([Flight]) -> Void)?
+    public var flightsUpdate: ((Message.FlightsUpdate) -> Void)?
 
     public init(server: String, port: Int) {
         self.socketClient = SocketClient(server: server, port: Int32(port))
@@ -38,10 +38,10 @@ public final class FDPClient {
             }
             switch messageType {
             case .flightsUpdate:
-                guard let message = FDPS.Message.FlightsUpdate(json: json) else {
+                guard let message = Message.FlightsUpdate(json: json) else {
                     return
                 }
-                self?.flightsUpdate?(message.flights)
+                self?.flightsUpdate?(message)
             case .airspaceUpdate:
                 print("Received airspace update")
             }
