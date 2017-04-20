@@ -18,6 +18,10 @@ import Dispatch
 import Foundation
 import Socket
 
+protocol SocketServerDelegate: class {
+    func socketServer(_ server: SocketServer, didAcceptConnection fromSocket: Socket)
+}
+
 final class SocketServer {
 
     fileprivate static let bufferSize = 4096
@@ -28,6 +32,8 @@ final class SocketServer {
     fileprivate let socketLockQueue = DispatchQueue.global()
     fileprivate let dispatchQueue = DispatchQueue.global()
     fileprivate var continueRunning = true
+
+    weak var delegate: SocketServerDelegate?
 
     init(port: Int) {
         self.port = port
@@ -57,6 +63,7 @@ final class SocketServer {
                     print("Accepted connection from \(newSocket.remoteHostname):\(newSocket.remotePort)")
                     //print("Socket Signature: \(newSocket.signature?.description)")
                     self.addNewConnection(socket: newSocket)
+                    self.delegate?.socketServer(self, didAcceptConnection: newSocket)
                 } while self.continueRunning
             }
             catch let error {

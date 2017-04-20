@@ -17,13 +17,20 @@
 import ATCKit
 import Foundation
 import JSON
+import Socket
+
+public protocol FDPServerDelegate: class {
+    func serverDidAcceptConnection(_ server: FDPServer)
+}
 
 public final class FDPServer {
 
+    public weak var delegate: FDPServerDelegate?
     private let socketServer: SocketServer
 
     public init(port: Int) {
         self.socketServer = SocketServer(port: port)
+        self.socketServer.delegate = self
         self.socketServer.run()
     }
 
@@ -37,5 +44,11 @@ public final class FDPServer {
         } catch {
             print("\(#function): \(error.localizedDescription)")
         }
+    }
+}
+
+extension FDPServer: SocketServerDelegate {
+    func socketServer(_ server: SocketServer, didAcceptConnection fromSocket: Socket) {
+        self.delegate?.serverDidAcceptConnection(self)
     }
 }
